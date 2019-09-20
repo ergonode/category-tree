@@ -2,7 +2,7 @@
 
 /**
  * Copyright © Bold Brand Commerce Sp. z o.o. All rights reserved.
- * See license.txt for license details.
+ * See LICENSE.txt for license details.
  */
 
 declare(strict_types = 1);
@@ -13,13 +13,15 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  */
-class TreeFormModel
+class CategoryTreeUpdateFormModel
 {
     /**
-     * @var string
+     * @var array
      *
-     * @Assert\NotBlank(message="Category name is required")
-     * @Assert\Length(min="3", max="32")
+     * @Assert\All({
+     *     @Assert\NotBlank(),
+     *     @Assert\Length(max=255, maxMessage="Category name is to long, It should have {{ limit }} character or less.")
+     * })
      */
     public $name;
 
@@ -34,6 +36,7 @@ class TreeFormModel
      */
     public function __construct()
     {
+        $this->name = [];
         $this->categories = [];
     }
 }

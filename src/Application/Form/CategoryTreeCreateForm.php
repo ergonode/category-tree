@@ -9,16 +9,16 @@ declare(strict_types = 1);
 
 namespace Ergonode\CategoryTree\Application\Form;
 
-use Ergonode\CategoryTree\Application\Model\TreeNodeFormModel;
+use Ergonode\CategoryTree\Application\Model\CategoryTreeCreateFormModel;
+use Ergonode\Core\Application\Form\Type\TranslationType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  */
-class TreeNodeForm extends AbstractType
+class CategoryTreeCreateForm extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
@@ -28,21 +28,12 @@ class TreeNodeForm extends AbstractType
     {
         $builder
             ->add(
-                'category_id',
-                TextType::class,
-                [
-                    'property_path' => 'categoryId',
-                ]
+                'code',
+                TextType::class
             )
             ->add(
-                'childrens',
-                CollectionType::class,
-                [
-                    'allow_add' => true,
-                    'allow_delete' => true,
-                    'entry_type' => __CLASS__,
-                    'prototype' => false,
-                ]
+                'name',
+                TranslationType::class
             );
     }
 
@@ -52,8 +43,15 @@ class TreeNodeForm extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => TreeNodeFormModel::class,
-            'translation_domain' => 'tree',
+            'data_class' => CategoryTreeCreateFormModel::class,
         ]);
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getBlockPrefix(): ?string
+    {
+        return null;
     }
 }
