@@ -10,16 +10,15 @@ declare(strict_types = 1);
 namespace Ergonode\CategoryTree\Persistence\Dbal\Projector;
 
 use Doctrine\DBAL\Connection;
-use Ergonode\CategoryTree\Domain\Event\CategoryTreeNameChangedEvent;
+use Ergonode\CategoryTree\Domain\Event\CategoryTreeDeletedEvent;
 use Ergonode\Core\Domain\Entity\AbstractId;
 use Ergonode\EventSourcing\Infrastructure\DomainEventInterface;
 use Ergonode\EventSourcing\Infrastructure\Exception\UnsupportedEventException;
 use Ergonode\EventSourcing\Infrastructure\Projector\DomainEventProjectorInterface;
-use JMS\Serializer\SerializerInterface;
 
 /**
  */
-class CategoryTreeNameChangedEventProjector implements DomainEventProjectorInterface
+class CategoryTreeDeletedEventProjector implements DomainEventProjectorInterface
 {
     private const TABLE = 'tree';
 
@@ -29,18 +28,11 @@ class CategoryTreeNameChangedEventProjector implements DomainEventProjectorInter
     private $connection;
 
     /**
-     * @var SerializerInterface
+     * @param Connection $connection
      */
-    private $serializer;
-
-    /**
-     * @param Connection          $connection
-     * @param SerializerInterface $serializer
-     */
-    public function __construct(Connection $connection, SerializerInterface $serializer)
+    public function __construct(Connection $connection)
     {
         $this->connection = $connection;
-        $this->serializer = $serializer;
     }
 
     /**
@@ -48,7 +40,7 @@ class CategoryTreeNameChangedEventProjector implements DomainEventProjectorInter
      */
     public function support(DomainEventInterface $event): bool
     {
-        return $event instanceof CategoryTreeNameChangedEvent;
+        return $event instanceof CategoryTreeDeletedEvent;
     }
 
     /**
@@ -56,15 +48,12 @@ class CategoryTreeNameChangedEventProjector implements DomainEventProjectorInter
      */
     public function projection(AbstractId $aggregateId, DomainEventInterface $event): void
     {
-        if (!$event instanceof CategoryTreeNameChangedEvent) {
-            throw new UnsupportedEventException($event, CategoryTreeNameChangedEvent::class);
+        if (!$event instanceof CategoryTreeDeletedEvent) {
+            throw new UnsupportedEventException($event, CategoryTreeDeletedEvent::class);
         }
 
-        $this->connection->update(
+        $this->connection->delete(
             self::TABLE,
-            [
-                'name' => $this->serializer->serialize($event->getTo()->getTranslations(), 'json'),
-            ],
             [
                 'id' => $aggregateId->getValue(),
             ]
